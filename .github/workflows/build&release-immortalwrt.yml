@@ -97,7 +97,7 @@ jobs:
       with:
         tag: ${{env.RELEASE_TAG}}
         allowUpdates: true
-        artifacts: release/*
+        artifacts: immortalwrt/release/*
         token: ${{ secrets.GITHUB_TOKEN }}
         body: |
           - ImmortalWrt: `${{env.IMOWRT_VER}}`

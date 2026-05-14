@@ -97,8 +97,8 @@ jobs:
         overwrite: true
         compression-level: 0
         if-no-files-found: warn
-        retention-days: 4
-        path: ${{ env.sdkfile }}
+        retention-days: 3
+        path: immortalwrt/${{ env.sdkfile }}
 
     - name: Remove the SDK file from firmware directory
       if: ${{ env.sdk == 'true' }}
@@ -116,5 +116,5 @@ jobs:
       with:
         name: x30e-pro-firmware
         overwrite: true
-        retention-days: 4
-        path: bin/targets/mediatek/filogic/*
+        retention-days: 3
+        path: immortalwrt/bin/targets/mediatek/filogic/*
