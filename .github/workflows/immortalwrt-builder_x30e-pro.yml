@@ -52,7 +52,7 @@ jobs:
     - name: Create configuration
       run: |
         cp myconfig/defconfig/${{ inputs.defconfig }} .config
-        if ! grep -q "CONFIG_SDK=y" .config; then
+        if grep -q "CONFIG_SDK=y" .config; then
           echo "Note: the SDK will be built"
           echo "sdk=true" >> $GITHUB_ENV
         else
