@@ -1,5 +1,5 @@
 # Build ImmortalWrt for Ruijie X30E Pro
-Source code to use: https://github.com/chasey-dev/immortalwrt-mt798x-rebase
+Source code to use: https://github.com/chasey-dev/immortalwrt-mt798x-rebase  
 Build ImmortalWrt using GitHub Actions.
 <br><br>
 

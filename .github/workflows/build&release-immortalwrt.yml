@@ -14,7 +14,7 @@ on:
         required: true
 
 jobs:
-  Build&Release-ImmortalWrt:
+  Build-and-Release-ImmortalWrt:
     runs-on: ubuntu-24.04
 
     steps:
