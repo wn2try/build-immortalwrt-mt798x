@@ -4,7 +4,7 @@ Build ImmortalWrt using GitHub Actions.
 <br><br>
 
 ## Build Steps
-Install requirements
+Install requirements for Ubuntu 24.04
 ```bash
 sudo apt update
 
@@ -35,5 +35,5 @@ make -j$(nproc) V=s
 ```
 The firmware will be located in `bin/targets/mediatek/filogic/`.  
 <br>
-Use the [hanwckf's u-boot](https://github.com/hanwckf/bl-mt798x) or [yuzhii's variant](https://github.com/Yuzhii0718/bl-mt798x-dhcpd) to flash the firmware.
+Use the [hanwckf's u-boot](https://github.com/hanwckf/bl-mt798x) or [yuzhii's variant](https://github.com/Yuzhii0718/bl-mt798x-dhcpd) to flash the factory firmware.
 <br><br>
