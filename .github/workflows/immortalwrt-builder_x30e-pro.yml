@@ -20,10 +20,22 @@ on:
 jobs:
   Build-ImmortalWrt:
     runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: immortalwrt
 
     steps:
-    - name: Checkout the repository
+    - name: Checkout external repository
       uses: actions/checkout@v6
+      with:
+        repository: ${{ inputs.repo_name }}
+        ref: ${{ inputs.branch_name }}
+        path: immortalwrt
+
+    - name: Checkout this repository
+      uses: actions/checkout@v6
+      with:
+        path: immortalwrt/myconfig
 
     - name: Setup dependencies
       run: |
@@ -32,13 +44,6 @@ jobs:
         gcc-multilib g++-multilib gettext git libncurses5-dev libssl-dev \
         python3-setuptools rsync swig unzip zlib1g-dev file wget curl
 
-    - name: Clone the source code
-      run: |
-        git clone -b ${{ inputs.branch_name }} --single-branch --filter=blob:none \
-        https://github.com/${{ inputs.repo_name }}.git immortalwrt
-
-        cd immortalwrt
-
     - name: Update the feeds
       run: |
         ./scripts/feeds update -a
@@ -46,7 +51,7 @@ jobs:
 
     - name: Create configuration
       run: |
-        cp ../defconfig/${{ inputs.defconfig }} .config
+        cp myconfig/defconfig/${{ inputs.defconfig }} .config
         if ! grep -q "CONFIG_SDK=y" .config; then
           echo "Note: the SDK will be built"
           echo "sdk=true" >> $GITHUB_ENV
