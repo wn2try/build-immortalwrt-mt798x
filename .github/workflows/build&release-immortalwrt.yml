@@ -4,36 +4,32 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
     inputs: 
-      repo_name:
-        description: ImmortalWrt repository name 
+      repo:
+        description: ImmortalWrt repository 
         default: chasey-dev/immortalwrt-mt798x-rebase
         required: true
-      branch_name:
-        description: Branch name with the repository
+      branch:
+        description: Branch with the repository
         default: 25.12
         required: true
 
 jobs:
   Build-and-Release-ImmortalWrt:
     runs-on: ubuntu-24.04
-    defaults:
-      run:
-        working-directory: immortalwrt
 
     steps:
     - name: Checkout external repository
       uses: actions/checkout@v6
       with:
-        repository: ${{ inputs.repo_name }}
-        ref: ${{ inputs.branch_name }}
-        path: immortalwrt
+        repository: ${{ inputs.repo }}
+        ref: ${{ inputs.branch }}
 
     - name: Checkout this repository
       uses: actions/checkout@v6
       with:
-        path: immortalwrt/myconfig
+        path: myrepo
 
-    - name: Setup dependencies
+    - name: Install dependencies
       run: |
         sudo apt update
         sudo apt install -y build-essential clang flex bison g++ gawk \
@@ -45,10 +41,12 @@ jobs:
         ./scripts/feeds update -a
         ./scripts/feeds install -a
 
-    - name: Create configuration
+    - name: Make firmware configurations & copy user files
       run: |
-        cp myconfig/defconfig/mt7981-ruijie-x30e-pro+sdk_defconfig .config
+        cp -r myrepo/files ./
+        cp myrepo/diffconfig/mt7981-ruijie-x30e-pro+sdk_diffconfig .config
         make defconfig
+        ls -la
 
     - name: Download source files
       run: |
@@ -63,7 +61,7 @@ jobs:
       run: |
         make target/linux/compile -j$(nproc) || make target/linux/compile -j1 V=s
 
-    # - name: Build ipk with -j1
+    # - name: Build apk with -j1
     #   run: |
     #     if [ -e package/mtk/libs/openssl1.1/Makefile ]; then
     #       echo "Compiling openssl1.1 with -j1"
@@ -97,7 +95,7 @@ jobs:
       with:
         tag: ${{env.RELEASE_TAG}}
         allowUpdates: true
-        artifacts: immortalwrt/release/*
+        artifacts: ./release/*
         token: ${{ secrets.GITHUB_TOKEN }}
         body: |
           - ImmortalWrt: `${{env.IMOWRT_VER}}`

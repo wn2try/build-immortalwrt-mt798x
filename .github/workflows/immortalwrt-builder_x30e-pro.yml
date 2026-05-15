@@ -4,40 +4,36 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
     inputs: 
-      repo_name:
+      repo:
         description: ImmortalWrt repository name 
         default: wn2try/immortalwrt-mt798x-rebase
         required: true
-      branch_name:
+      branch:
         description: Branch name with the repository
         default: 25.12
         required: true
-      defconfig:
-        description: Defconfig file to use
-        default: mt7981-ruijie-x30e-pro_defconfig
+      diffconfig:
+        description: Diffconfig file to use
+        default: mt7981-ruijie-x30e-pro_diffconfig
         required: true
 
 jobs:
   Build-ImmortalWrt:
     runs-on: ubuntu-24.04
-    defaults:
-      run:
-        working-directory: immortalwrt
 
     steps:
     - name: Checkout external repository
       uses: actions/checkout@v6
       with:
-        repository: ${{ inputs.repo_name }}
-        ref: ${{ inputs.branch_name }}
-        path: immortalwrt
+        repository: ${{ inputs.repo }}
+        ref: ${{ inputs.branch }}
 
     - name: Checkout this repository
       uses: actions/checkout@v6
       with:
-        path: immortalwrt/myconfig
+        path: myrepo
 
-    - name: Setup dependencies
+    - name: Install dependencies
       run: |
         sudo apt update
         sudo apt install -y build-essential clang flex bison g++ gawk \
@@ -49,9 +45,11 @@ jobs:
         ./scripts/feeds update -a
         ./scripts/feeds install -a
 
-    - name: Create configuration
+    - name: Make firmware configurations & copy user files
       run: |
-        cp myconfig/defconfig/${{ inputs.defconfig }} .config
+        cp -r myrepo/files ./
+        
+        cp myrepo/diffconfig/${{ inputs.diffconfig }} .config
         if grep -q "CONFIG_SDK=y" .config; then
           echo "Note: the SDK will be built"
           echo "sdk=true" >> $GITHUB_ENV
@@ -61,6 +59,7 @@ jobs:
         fi
 
         make defconfig
+        ls -la
 
     - name: Download source files
       run: |
@@ -75,7 +74,7 @@ jobs:
       run: |
         make target/linux/compile -j$(nproc) || make target/linux/compile -j1 V=s
 
-    # - name: Build ipk with -j1
+    # - name: Build apk with -j1
     #   run: |
     #     if [ -e package/mtk/libs/openssl1.1/Makefile ]; then
     #       echo "Compiling openssl1.1 with -j1"
@@ -98,7 +97,7 @@ jobs:
         compression-level: 0
         if-no-files-found: warn
         retention-days: 3
-        path: immortalwrt/${{ env.sdkfile }}
+        path: ${{ env.sdkfile }}
 
     - name: Remove the SDK file from firmware directory
       if: ${{ env.sdk == 'true' }}
@@ -117,4 +116,4 @@ jobs:
         name: x30e-pro-firmware
         overwrite: true
         retention-days: 3
-        path: immortalwrt/bin/targets/mediatek/filogic/*
+        path: bin/targets/mediatek/filogic/*
