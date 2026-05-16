@@ -17,6 +17,8 @@ Clone the source code
 git clone -b 25.12 --single-branch --filter=blob:none \
 https://github.com/chasey-dev/immortalwrt-mt798x-rebase.git immortalwrt
 
+git clone --depth 1 https://github.com/wn2try/immortalwrt-x30e-pro x30epro
+
 cd immortalwrt
 ```
 Update the feeds
@@ -24,10 +26,14 @@ Update the feeds
 ./scripts/feeds update -a
 ./scripts/feeds install -a
 ```
-Configure the build
+Configure the firmware build
 ```bash
-cp ../defconfig/mt7981-ruijie-x30e-pro_defconfig .config
+cp ../x30epro/diffconfig/mt7981-ruijie-x30e-pro_diffconfig .config
 make defconfig
+```
+Copy user files to `<buildroot>`
+```bash
+cp ../x30epro/files ./
 ```
 Build the firmware
 ```bash
@@ -35,5 +41,5 @@ make -j$(nproc) V=s
 ```
 The firmware will be located in `bin/targets/mediatek/filogic/`.  
 <br>
-Use the [hanwckf's u-boot](https://github.com/hanwckf/bl-mt798x) or [yuzhii's variant](https://github.com/Yuzhii0718/bl-mt798x-dhcpd) to flash the factory firmware.
+Use the [hanwckf's u-boot](https://github.com/hanwckf/bl-mt798x) or [yuzhii's variant](https://github.com/Yuzhii0718/bl-mt798x-dhcpd) to flash the `factory` firmware for the first time. `sysupgrade` can be used for upgrading later on.
 <br><br>
