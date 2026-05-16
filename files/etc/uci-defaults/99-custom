@@ -1,8 +1,8 @@
 ## /etc/uci-defaults/99-custom 
 ## removed after execution with exit 0
 
-sed -E -e '/routing|telephony|video/s/^/*/' \
+sed -E -e '/routing|telephony|video/s/^/#/' \
     -e 's|mirrors.vsean.net/openwrt|mirrors.pku.edu.cn/immortalwrt|' \
-    -i /etc/opkg/distfeeds.conf
+    -i /etc/apk/repositories.d/distfeeds.list
 
 exit 0
