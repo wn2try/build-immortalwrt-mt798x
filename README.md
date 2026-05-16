@@ -1,5 +1,6 @@
 # Build ImmortalWrt for Ruijie X30E Pro
 Source code to use: https://github.com/chasey-dev/immortalwrt-mt798x-rebase  
+<br>
 Build ImmortalWrt using GitHub Actions.
 <br><br>
 
@@ -33,13 +34,14 @@ make defconfig
 ```
 Copy user files to `<buildroot>`
 ```bash
-cp ../x30epro/files ./
+cp -r ../x30epro/files ./
 ```
 Build the firmware
 ```bash
-make -j$(nproc) V=s
+make -j$(nproc) || make -j1 V=s
 ```
-The firmware will be located in `bin/targets/mediatek/filogic/`.  
-<br>
-Use the [hanwckf's u-boot](https://github.com/hanwckf/bl-mt798x) or [yuzhii's variant](https://github.com/Yuzhii0718/bl-mt798x-dhcpd) to flash the `factory` firmware for the first time. `sysupgrade` can be used for upgrading later on.
+The firmware image will be located in `bin/targets/mediatek/filogic/`.  
+<br>  
+
+Use the [hanwckf's u-boot](https://github.com/hanwckf/bl-mt798x) or [yuzhii's variant](https://github.com/Yuzhii0718/bl-mt798x-dhcpd) to flash the `factory` firmware for the first time, `sysupgrade` can be used for upgrading later on.  
 <br><br>
