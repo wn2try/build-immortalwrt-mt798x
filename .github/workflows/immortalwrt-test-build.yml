@@ -1,4 +1,4 @@
-name: Build ImmortalWrt for X30E Pro
+name: Test Build of ImmortalWrt
 
 on:
   # Allows you to run this workflow manually from the Actions tab
@@ -14,7 +14,7 @@ on:
         required: true
       diffconfig:
         description: Diffconfig file to use
-        default: mt7981-ruijie-x30e-pro_diffconfig
+        default: mt7986-ruijie-x60-new-ubi_diffconfig
         required: true
 
 jobs:
@@ -86,13 +86,17 @@ jobs:
     - name: Build the firmware image 
       run: |
         make -j$(nproc) || make -j1 V=s
+
         echo "sdkfile=bin/targets/mediatek/filogic/*-sdk-*.tar.*" >> $GITHUB_ENV
+        
+        device=$(echo ${{ inputs.diffconfig }} | sed -E -e 's/(mt7981|mt7986)-ruijie-//' -e 's/(|\+sdk)_diffconfig//')
+        echo "device=${device}" >> $GITHUB_ENV
 
     - name: Upload the SDK
       if: ${{ env.sdk == 'true' }}
       uses: actions/upload-artifact@v7
       with:
-        name: x30e-pro-sdk
+        name: ${{ env.device }}-sdk
         overwrite: true
         compression-level: 0
         if-no-files-found: warn
@@ -113,7 +117,7 @@ jobs:
     - name: Upload the firmware and kmods
       uses: actions/upload-artifact@v7
       with:
-        name: x30e-pro-firmware
+        name: ${{ env.device }}-firmware
         overwrite: true
         retention-days: 3
         path: bin/targets/mediatek/filogic/*

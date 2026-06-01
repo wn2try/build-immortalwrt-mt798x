@@ -1,4 +1,4 @@
-# Build ImmortalWrt for Ruijie X30E Pro
+# Build ImmortalWrt for Ruijie X30E Pro and Ruijie X60 New
 Source code to use: https://github.com/chasey-dev/immortalwrt-mt798x-rebase  
 <br>
 Build ImmortalWrt using GitHub Actions.
@@ -18,7 +18,7 @@ Clone the source code
 git clone -b 25.12 --single-branch --filter=blob:none \
 https://github.com/chasey-dev/immortalwrt-mt798x-rebase.git immortalwrt
 
-git clone --depth 1 https://github.com/wn2try/immortalwrt-x30e-pro x30epro
+git clone --depth 1 https://github.com/wn2try/immortalwrt-mt798x.git mt798x
 
 cd immortalwrt
 ```
@@ -29,12 +29,12 @@ Update the feeds
 ```
 Configure the firmware build
 ```bash
-cp ../x30epro/diffconfig/mt7981-ruijie-x30e-pro_diffconfig .config
+cp ../mt798x/diffconfig/mt7981-ruijie-x30e-pro_diffconfig .config
 make defconfig
 ```
 Copy user files to `<buildroot>`
 ```bash
-cp -r ../x30epro/files ./
+cp -r ../mt798x/files ./
 ```
 Build the firmware
 ```bash
@@ -43,5 +43,5 @@ make -j$(nproc) || make -j1 V=s
 The firmware image will be located in `bin/targets/mediatek/filogic/`.  
 <br>  
 
-Use the [hanwckf's u-boot](https://github.com/hanwckf/bl-mt798x) or [yuzhii's variant](https://github.com/Yuzhii0718/bl-mt798x-dhcpd) to flash the `factory` firmware for the first time, `sysupgrade` can be used for upgrading later on.  
+Use the [hanwckf's u-boot](https://github.com/hanwckf/bl-mt798x) or [yuzhii's variant](https://github.com/Yuzhii0718/bl-mt798x-dhcpd) to flash the `factory` or `sysupgrade` image for the first time, `sysupgrade` can be used for upgrading later on.  
 <br><br>
