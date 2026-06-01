@@ -45,3 +45,112 @@ The firmware image will be located in `bin/targets/mediatek/filogic/`.
 
 Use the [hanwckf's u-boot](https://github.com/hanwckf/bl-mt798x) or [yuzhii's variant](https://github.com/Yuzhii0718/bl-mt798x-dhcpd) to flash the `factory` or `sysupgrade` image for the first time, `sysupgrade` can be used for upgrading later on.  
 <br><br>
+
+## X60 New (UBI)
+The `fip (u-boot)` is stored in a static UBI volume, which requires the `bl2` to be built with full-UBI support (UBI=1).  
+Be aware that this `bl2` is unable to load `fip` from a mtd partition.  
+
+<br>  
+
+mtd layout:  
+| mtd          | size    |
+| ------------ | ------- |
+| BL2          | 1024k   |
+| u-boot-env   | 512k    |
+| Factory      | 2048k   |
+| FIP          | 2048k   |
+| product_info | 512k    |
+| kdump        | 512k    |
+| ubi          | 124416k |
+
+<br>  
+
+ubi (124416k) volumes:  
+| name         | type    | size   |
+| ------------ | ------- | ------ |
+| factory      | static  | 124KiB |
+| product_info | static  | 124KiB |
+| fip          | static  | 2MiB   |
+| ubootenv     | dynamic | 124KiB |
+| ubootenv2    | dynamic | 124KiB |
+| fit          | dynamic |        |
+
+<br><br>
+
+### Flash Instructions  
+
+<br>
+
+Load `initramfs` image from u-boot via `TFTP` or `Web failsafe`.  
+
+<br>
+
+Login to the device via `SSH`.  
+Ensure that the device has the same mtd layout as follows:  
+```
+root@ImmortalWrt:~# cat /proc/mtd
+dev:    size   erasesize  name
+mtd0: 00100000 00020000 "BL2"
+mtd1: 00080000 00020000 "u-boot-env"
+mtd2: 00200000 00020000 "Factory"
+mtd3: 00200000 00020000 "FIP"
+mtd4: 00080000 00020000 "product_info"
+mtd5: 00080000 00020000 "kdump"
+mtd6: 07980000 00020000 "ubi"
+```
+
+<br>
+
+Upload the following files to device `/root` directory.  
+- `x60-new-ubi-preloader.bin`
+- `x60-new-ubi-bl31-uboot.fip`
+- `x60-new-ubi-squashfs-sysupgrade.itb`
+
+<br>
+
+Run the following commands to make the ubi volumes:  
+```bash
+dd if=/dev/mtd2 of=/root/factory_4k.bin bs=4096 count=1
+dd if=/dev/mtd4 of=/root/product_info_1k.bin bs=1024 count=1
+
+insmod mtd-rw i_want_a_brick=1
+
+ubidetach -p /dev/mtd6
+mtd erase ubi 
+ubiformat /dev/mtd6
+ubiattach -p /dev/mtd6
+# ubinfo -a
+
+ubimkvol /dev/ubi0 -t static -N factory -s 124KiB
+ubimkvol /dev/ubi0 -t static -N product_info -s 124KiB
+ubimkvol /dev/ubi0 -t static -N fip -s 2MiB
+ubimkvol /dev/ubi0 -N ubootenv -s 124KiB
+ubimkvol /dev/ubi0 -N ubootenv2 -s 124KiB
+# ubinfo -a
+
+ubiupdatevol /dev/ubi0_0 /root/factory_4k.bin
+ubiupdatevol /dev/ubi0_1 /root/product_info_1k.bin
+ubiupdatevol /dev/ubi0_2 /root/x60-new-ubi-bl31-uboot.fip
+# ubinfo -a
+```
+
+<br>
+
+Update the mtd BL2 with the new preloader:  
+```bash
+mtd erase BL2
+mtd write /root/x60-new-ubi-preloader.bin BL2
+```
+
+<br>
+
+Flash the sysupgrade image:  
+```bash
+sysupgrade -n /root/x60-new-ubi-squashfs-sysupgrade.itb
+```
+
+<br>
+
+Reboot the device with command `reboot`.  
+
+<br><br>
