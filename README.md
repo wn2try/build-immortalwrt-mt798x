@@ -71,8 +71,8 @@ ubi (124416k) volumes:
 | factory      | static  | 124KiB |
 | product_info | static  | 124KiB |
 | fip          | static  | 2MiB   |
-| ubootenv     | dynamic | 124KiB |
-| ubootenv2    | dynamic | 124KiB |
+| ubootenv     | dynamic | 248KiB |
+| ubootenv2    | dynamic | 248KiB |
 | fit          | dynamic |        |
 
 <br><br>
@@ -121,8 +121,8 @@ ubiattach -p /dev/mtd6
 ubimkvol /dev/ubi0 -t static -N factory -s 124KiB
 ubimkvol /dev/ubi0 -t static -N product_info -s 124KiB
 ubimkvol /dev/ubi0 -t static -N fip -s 2MiB
-ubimkvol /dev/ubi0 -N ubootenv -s 124KiB
-ubimkvol /dev/ubi0 -N ubootenv2 -s 124KiB
+ubimkvol /dev/ubi0 -N ubootenv -s 248KiB
+ubimkvol /dev/ubi0 -N ubootenv2 -s 248KiB
 # ubinfo -a
 
 ubiupdatevol /dev/ubi0_0 /root/factory_4k.bin
