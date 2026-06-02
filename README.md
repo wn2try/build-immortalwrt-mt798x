@@ -151,6 +151,6 @@ sysupgrade -n /root/x60-new-ubi-squashfs-sysupgrade.itb
 
 <br>
 
-Reboot the device with command `reboot`.  
+Device automatically reboots itself, wait until it comes back online.  
 
 <br><br>
