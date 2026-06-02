@@ -113,10 +113,7 @@ Run the following commands to make the ubi volumes:
 dd if=/dev/mtd2 of=/root/factory_4k.bin bs=4096 count=1
 dd if=/dev/mtd4 of=/root/product_info_1k.bin bs=1024 count=1
 
-insmod mtd-rw i_want_a_brick=1
-
 ubidetach -p /dev/mtd6
-mtd erase ubi 
 ubiformat /dev/mtd6
 ubiattach -p /dev/mtd6
 # ubinfo -a
@@ -138,6 +135,8 @@ ubiupdatevol /dev/ubi0_2 /root/x60-new-ubi-bl31-uboot.fip
 
 Update the mtd BL2 with the new preloader:  
 ```bash
+insmod mtd-rw i_want_a_brick=1
+
 mtd erase BL2
 mtd write /root/x60-new-ubi-preloader.bin BL2
 ```
