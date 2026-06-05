@@ -121,3 +121,22 @@ jobs:
         overwrite: true
         retention-days: 3
         path: bin/targets/mediatek/filogic/*
+
+    - name: Create initramfs image for first installation
+      if: ${{ env.device == 'x60-new-ubi' }}
+      run: |
+        cp myrepo/initramfs/mt7986a-ruijie-rg-x60-new-ubi.dts target/linux/mediatek/dts-ext/
+        make target/linux/clean
+        make -j$(nproc) || make -j1 V=s
+
+        mv bin/targets/mediatek/filogic/*-initramfs-*.itb \
+        bin/immortalwrt-25.12-snapshot-x60-new-ubi-initramfs_first-install.itb
+
+    - name: Upload the initramfs image
+      if: ${{ env.device == 'x60-new-ubi' }}
+      uses: actions/upload-artifact@v7
+      with:
+        name: ${{ env.device }}-initramfs
+        overwrite: true
+        retention-days: 3
+        path: bin/immortalwrt-25.12-snapshot-x60-new-ubi-initramfs_first-install.itb

@@ -87,7 +87,7 @@ jobs:
           echo "KERNEL_VER=$kernelver" >> $GITHUB_ENV
           
           srctime=$(jq ".source_date_epoch" bin/targets/mediatek/filogic/profiles.json)
-          releasetag=$(date -d "@$srctime" +"%y%m%dT%H%M")
+          releasetag=$(date -d "@$srctime" +"%Y%m%dT%H%M")
           echo "RELEASE_TAG=$releasetag" >> $GITHUB_ENV
 
     - name: Release artifacts

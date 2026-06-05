@@ -18,7 +18,7 @@ Clone the source code
 git clone -b 25.12 --single-branch --filter=blob:none \
 https://github.com/chasey-dev/immortalwrt-mt798x-rebase.git immortalwrt
 
-git clone --depth 1 https://github.com/wn2try/immortalwrt-mt798x.git mt798x
+git clone --depth 1 https://github.com/wn2try/build-immortalwrt-mt798x.git mt798x
 
 cd immortalwrt
 ```
@@ -43,16 +43,16 @@ make -j$(nproc) || make -j1 V=s
 The firmware image will be located in `bin/targets/mediatek/filogic/`.  
 <br>  
 
-Use the [hanwckf's u-boot](https://github.com/hanwckf/bl-mt798x) or [yuzhii's variant](https://github.com/Yuzhii0718/bl-mt798x-dhcpd) to flash the `factory` or `sysupgrade` image for the first time, `sysupgrade` can be used for upgrading later on.  
+Use [hanwckf's u-boot](https://github.com/hanwckf/bl-mt798x) or [yuzhii's variant](https://github.com/Yuzhii0718/bl-mt798x-dhcpd) to flash the `factory` or `sysupgrade` image for the first time, `sysupgrade` can be used for upgrading later on.  
 <br><br>
 
 ## X60 New (UBI)
-The `fip (u-boot)` is stored in a static UBI volume, which requires the `bl2` to be built with full-UBI support (UBI=1).  
-Be aware that this `bl2` is unable to load `fip` from a mtd partition.  
+`fip`(`u-boot`) is stored in a static UBI volume, which requires `bl2` to be built with full-UBI support (UBI=1).  
+Note that this `bl2` is unable to load `fip` from a mtd partition.  
 
 <br>  
 
-mtd layout:  
+MTD layout:  
 | mtd          | size    |
 | ------------ | ------- |
 | BL2          | 1024k   |
@@ -65,14 +65,14 @@ mtd layout:
 
 <br>  
 
-ubi (124416k) volumes:  
+UBI (124416k) volumes:  
 | name         | type    | size   |
 | ------------ | ------- | ------ |
 | factory      | static  | 124KiB |
 | product_info | static  | 124KiB |
 | fip          | static  | 2MiB   |
-| ubootenv     | dynamic | 248KiB |
-| ubootenv2    | dynamic | 248KiB |
+| ubootenv     | dynamic | 124KiB |
+| ubootenv2    | dynamic | 124KiB |
 | fit          | dynamic |        |
 
 <br><br>
@@ -108,7 +108,7 @@ Upload the following files to device `/root` directory.
 
 <br>
 
-Run the following commands to make the ubi volumes:  
+Run the following commands to create the UBI volumes:  
 ```bash
 dd if=/dev/mtd2 of=/root/factory_4k.bin bs=4096 count=1
 dd if=/dev/mtd4 of=/root/product_info_1k.bin bs=1024 count=1
@@ -121,8 +121,8 @@ ubiattach -p /dev/mtd6
 ubimkvol /dev/ubi0 -t static -N factory -s 124KiB
 ubimkvol /dev/ubi0 -t static -N product_info -s 124KiB
 ubimkvol /dev/ubi0 -t static -N fip -s 2MiB
-ubimkvol /dev/ubi0 -N ubootenv -s 248KiB
-ubimkvol /dev/ubi0 -N ubootenv2 -s 248KiB
+ubimkvol /dev/ubi0 -N ubootenv -s 124KiB
+ubimkvol /dev/ubi0 -N ubootenv2 -s 124KiB
 # ubinfo -a
 
 ubiupdatevol /dev/ubi0_0 /root/factory_4k.bin
@@ -133,7 +133,7 @@ ubiupdatevol /dev/ubi0_2 /root/x60-new-ubi-bl31-uboot.fip
 
 <br>
 
-Update the mtd BL2 with the new preloader:  
+Replace `bl2`:  
 ```bash
 insmod mtd-rw i_want_a_brick=1
 

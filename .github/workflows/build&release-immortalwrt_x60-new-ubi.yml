@@ -74,21 +74,34 @@ jobs:
       run: |
         make -j$(nproc) || make -j1 V=s
 
-    - name: Create release artifacts
+    - name: Create release artifacts - system firmware and SDK tarball
       run: |
-          mkdir release
-          mv bin/targets/mediatek/filogic/*-sdk-*.tar.* release/
-          tar -czf release/immortalwrt-25.12-snapshot-x60-new-ubi.tar.gz -C bin/targets/mediatek/filogic/ .
+        mkdir release
+        mv bin/targets/mediatek/filogic/*-sdk-*.tar.* release/
+        tar -czf release/immortalwrt-25.12-snapshot-x60-new-ubi.tar.gz -C bin/targets/mediatek/filogic/ .
+      
+        imowrtver=$(jq ".version_number" bin/targets/mediatek/filogic/profiles.json | tr -d '"')
+        echo "IMOWRT_VER=$imowrtver" >> $GITHUB_ENV
+        
+        kernelver=$(jq ".packages.kernel" bin/targets/mediatek/filogic/packages/index.json | tr -d '"')
+        echo "KERNEL_VER=$kernelver" >> $GITHUB_ENV
+        
+        srctime=$(jq ".source_date_epoch" bin/targets/mediatek/filogic/profiles.json)
+        releasetag=$(date -d "@$srctime" +"%Y%m%dT%H%M")
+        echo "RELEASE_TAG=$releasetag" >> $GITHUB_ENV
 
-          imowrtver=$(jq ".version_number" bin/targets/mediatek/filogic/profiles.json | tr -d '"')
-          echo "IMOWRT_VER=$imowrtver" >> $GITHUB_ENV
-          
-          kernelver=$(jq ".packages.kernel" bin/targets/mediatek/filogic/packages/index.json | tr -d '"')
-          echo "KERNEL_VER=$kernelver" >> $GITHUB_ENV
-          
-          srctime=$(jq ".source_date_epoch" bin/targets/mediatek/filogic/profiles.json)
-          releasetag=$(date -d "@$srctime" +"%y%m%dT%H%M")
-          echo "RELEASE_TAG=$releasetag" >> $GITHUB_ENV
+    - name: Create release artifacts - initramfs image for first installation
+      run: |
+        cp myrepo/initramfs/mt7986a-ruijie-rg-x60-new-ubi.dts target/linux/mediatek/dts-ext/
+        make target/linux/clean
+        make -j$(nproc) || make -j1 V=s
+
+        mv bin/targets/mediatek/filogic/*-initramfs-*.itb \
+        bin/immortalwrt-25.12-snapshot-x60-new-ubi-initramfs_first-install.itb
+        tar -czf release/immortalwrt-25.12-snapshot-x60-new-ubi-initramfs_first-install.tar.gz \
+        -C bin/ immortalwrt-25.12-snapshot-x60-new-ubi-initramfs_first-install.itb
+
+        ls -l release/
 
     - name: Release artifacts
       uses: ncipollo/release-action@v1
@@ -102,3 +115,7 @@ jobs:
           - Kernel: `${{env.KERNEL_VER}}`
           - Default IP: `192.168.1.1`
 
+          <br>
+
+          immortalwrt-25.12-snapshot-x60-new-ubi-initramfs_first-install.itb
+          - use this one for the first installation if the relevant UBI volumes are not created yet.
