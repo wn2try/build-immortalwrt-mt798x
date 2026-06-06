@@ -189,6 +189,7 @@ CONFIG_PACKAGE_kmod-tun=y
 CONFIG_PACKAGE_kmod-warp=y
 CONFIG_PACKAGE_kmod-zram=y
 CONFIG_PACKAGE_kvcedit=y
+CONFIG_PACKAGE_l1util=y
 CONFIG_PACKAGE_libatomic=y
 CONFIG_PACKAGE_libblkid=y
 CONFIG_PACKAGE_libcap-ng=y
