@@ -106,7 +106,7 @@ jobs:
     - name: Release artifacts
       uses: ncipollo/release-action@v1
       with:
-        tag: ${{env.RELEASE_TAG}}
+        tag: ${{env.RELEASE_TAG}}_X60-New-UBI
         allowUpdates: true
         artifacts: ./release/*
         token: ${{ secrets.GITHUB_TOKEN }}
