@@ -49,7 +49,7 @@ jobs:
         echo "export input variables..."
         export variant=${{inputs.variant}} openwrtver=${{inputs.openwrtver}} \
           model=${{inputs.model}} vendor=${{inputs.vendor}} \
-          pkgadd=${{inputs.pkgadd}} pkgremove=${{inputs.pkgremove}}
+          pkgadd="${{inputs.pkgadd}}" pkgremove="${{inputs.pkgremove}}"
 
         echo "run script..."
         cd vanilla
