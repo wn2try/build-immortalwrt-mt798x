@@ -1,4 +1,4 @@
-name: X30E Pro - ImmortalWrt Build & Release
+name:  MTK ImmortalWrt - X60 New (UBI)
 
 on:
   # Allows you to run this workflow manually from the Actions tab
@@ -44,7 +44,7 @@ jobs:
     - name: Make firmware configurations & copy user files
       run: |
         cp -r myrepo/files ./
-        cp myrepo/diffconfig/mt7981-ruijie-x30e-pro+sdk_diffconfig .config
+        cp myrepo/diffconfig/mt7986-ruijie-x60-new-ubi+sdk_diffconfig .config
         make defconfig
         ls -la
 
@@ -74,32 +74,49 @@ jobs:
       run: |
         make -j$(nproc) || make -j1 V=s
 
-    - name: Create release artifacts
+    - name: Create release artifacts - system firmware and SDK tarball
       run: |
-          mkdir release
-          mv bin/targets/mediatek/filogic/*-sdk-*.tar.* release/
-          tar -czf release/immortalwrt-25.12-snapshot-x30e-pro.tar.gz -C bin/targets/mediatek/filogic/ .
+        mkdir release
+        mv bin/targets/mediatek/filogic/*-sdk-*.tar.* release/
+        tar -czf release/immortalwrt-25.12-snapshot-x60-new-ubi.tar.gz -C bin/targets/mediatek/filogic/ .
+      
+        imowrtver=$(jq ".version_number" bin/targets/mediatek/filogic/profiles.json | tr -d '"')
+        echo "IMOWRT_VER=$imowrtver" >> $GITHUB_ENV
+        vercode=$(jq ".version_code" bin/targets/mediatek/filogic/profiles.json | tr -d '"')
+        echo "VER_CODE=$vercode" >> $GITHUB_ENV
+        
+        kernelver=$(jq ".packages.kernel" bin/targets/mediatek/filogic/packages/index.json | tr -d '"')
+        echo "KERNEL_VER=$kernelver" >> $GITHUB_ENV
+        
+        releasetag=$(date +"%Y%m%dT%H%M")
+        echo "RELEASE_TAG=$releasetag" >> $GITHUB_ENV
 
-          imowrtver=$(jq ".version_number" bin/targets/mediatek/filogic/profiles.json | tr -d '"')
-          echo "IMOWRT_VER=$imowrtver" >> $GITHUB_ENV
-          
-          kernelver=$(jq ".packages.kernel" bin/targets/mediatek/filogic/packages/index.json | tr -d '"')
-          echo "KERNEL_VER=$kernelver" >> $GITHUB_ENV
-          
-          srctime=$(jq ".source_date_epoch" bin/targets/mediatek/filogic/profiles.json)
-          releasetag=$(date -d "@$srctime" +"%Y%m%dT%H%M")
-          echo "RELEASE_TAG=$releasetag" >> $GITHUB_ENV
+    - name: Create release artifacts - initramfs image for first installation
+      run: |
+        cp myrepo/initramfs/mt7986a-ruijie-rg-x60-new-ubi.dts target/linux/mediatek/dts-ext/
+        make target/linux/clean
+        make -j$(nproc) || make -j1 V=s
+
+        mv bin/targets/mediatek/filogic/*-initramfs-*.itb \
+        bin/immortalwrt-25.12-snapshot-x60-new-ubi-initramfs_first-install.itb
+        tar -czf release/immortalwrt-25.12-snapshot-x60-new-ubi-initramfs_first-install.tar.gz \
+        -C bin/ immortalwrt-25.12-snapshot-x60-new-ubi-initramfs_first-install.itb
+
+        ls -l release/
 
     - name: Release artifacts
       uses: ncipollo/release-action@v1
       with:
-        tag: ${{env.RELEASE_TAG}}_X30E-Pro
+        tag: ${{env.RELEASE_TAG}}_X60-New-UBI
         allowUpdates: true
         artifacts: ./release/*
         token: ${{ secrets.GITHUB_TOKEN }}
         body: |
-          - ImmortalWrt: `${{env.IMOWRT_VER}}`
+          - ImmortalWrt: `${{env.IMOWRT_VER}} ~ ${{env.VER_CODE}}`
           - Kernel: `${{env.KERNEL_VER}}`
-          - MTD Layout: `openwrt-firmware-combined`
           - Default IP: `192.168.1.1`
 
+          <br>
+
+          immortalwrt-25.12-snapshot-x60-new-ubi-initramfs_first-install.itb
+          - use this one for the first installation if the relevant UBI volumes are not created yet.
