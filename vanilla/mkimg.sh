@@ -23,7 +23,6 @@ pkgremove=${pkgremove:-}
 firmwarenm=${variant}-${openwrtver}-${model}-squashfs-sysupgrade
 
 initkernelsrc=mediatek-filogic-openwrt_one-initramfs.itb
-initramfsdtb=image-*-${model}_initramfs.dtb
 initramfsnm=${variant}-${openwrtver}-${model}-initramfs
 
 cd $(dirname "$0")
@@ -42,8 +41,8 @@ fi
 
 if [ ! -d builder ]; then
   echo "download imagebuilder..."
-	wget -O - ${downloadurl} | tar --zstd -xf - 
-	mv *imagebuilder*-x86_64 builder
+  wget -O - ${downloadurl} | tar --zstd -xf - 
+  mv *imagebuilder*-x86_64 builder
 fi
 
 cd builder
@@ -139,7 +138,7 @@ PACKAGES="${pkgadd} ${pkgremove}"
 
 ## create initramfs.itb
 echo -e "\nprepare initrd..."
-initrddir=${rootpath}/builder/build_dir/target-aarch64_cortex-a53_musl/root-mediatek
+initrddir=${rootpath}/builder/build_dir/target-aarch64_cortex-a53_musl/root-${platform}
 cp -fpR ${rootpath}/builder/target/linux/generic/other-files/init ${initrddir}/
 (cd ${initrddir}; find . | LC_ALL=C sort | ${hostbindir}/cpio --reproducible -o -H newc -R 0:0 > ${outdir}/initrd.cpio)
 ${hostbindir}/xz -T0 -9 -fz --check=crc32 ${outdir}/initrd.cpio
@@ -148,13 +147,17 @@ rm -f ${initrddir}/init
 dumpimage -T flat_dt -p 0 -o ${outdir}/kernel.lzma \
 ${rootpath}/builder/staging_dir/target-aarch64_cortex-a53_musl/image/${initkernelsrc}
 
+dtc -@ -I dtb -O dts -o ${outdir}/initramfs.dts ${modeldir}/image-*-${model}.dtb
+cat ${modeldir}/*${model}_initramfs.dtsi >> ${outdir}/initramfs.dts
+dtc -q -@ -I dts -O dtb -o ${outdir}/initramfs.dtb ${outdir}/initramfs.dts
+
 echo -e "\ncreate its for initramfs..."
 kernelver=$(jq .linux_kernel.version ${outdir}/profiles.json | tr -d '"')
 ${rootpath}/builder/scripts/mkits.sh -D ${device} -c "config-1" \
 -A arm64 -v ${kernelver} -C lzma -a 0x48000000 -e 0x48000000 \
 -k ${outdir}/kernel.lzma \
 -i ${outdir}/initrd.cpio.xz \
--d ${modeldir}/${initramfsdtb} \
+-d ${outdir}/initramfs.dtb \
 -o ${outdir}/${initramfsnm}.its
 
 echo -e "\ncreate initramfs itb..."
@@ -169,8 +172,8 @@ cd ${rootpath} && mkdir -p release && cd release
 mv ${outdir}/*-${model}-squashfs-sysupgrade.itb ./${firmwarenm}.itb
 mv ${outdir}/${initramfsnm}.itb .
 
-gzip -9f ${firmwarenm}.itb
-gzip -9f ${initramfsnm}.itb
+gzip -1f ${firmwarenm}.itb
+gzip -1f ${initramfsnm}.itb
 
 mv ${outdir}/*${model}.manifest ./${variant}-${openwrtver}-${model}.manifest
 mv ${outdir}/profiles.json .

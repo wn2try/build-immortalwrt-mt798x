@@ -7,7 +7,7 @@ ImmortalWrt 25.12 with MTK HNAT enabled
 <br>
 
 Vanilla ImmortalWrt  
-- build via Image Builder: https://downloads.immortalwrt.org  
+- build via `Image Builder`: https://downloads.immortalwrt.org  
 
 <br><br>
 
@@ -20,7 +20,7 @@ file wget gawk git gettext libssl-dev xsltproc rsync unzip \
 python3 python3-setuptools u-boot-tools
 ```
 
-Download the Image Builder
+Download the `Image Builder`
 ```bash
 download_site=https://downloads.immortalwrt.org
 imfile=immortalwrt-imagebuilder-25.12.0-mediatek-filogic.Linux-x86_64.tar.zst
@@ -34,7 +34,7 @@ Add build target into `builder/target/linux/mediatek/image/filogic.mk`
 Add board profile into `builder/.targetinfo`  
 Add board specific files to `builder/files/`  
 Copy board dtb to `builder/build_dir/target-aarch64_cortex-a53_musl/linux-mediatek_filogic/`  
-- rename as `image-mt7986a-ruijie-rg-x60-new-ubi.dtb`  
+- renamed as `image-mt7986a-ruijie-rg-x60-new-ubi.dtb`  
 
 <br>
 

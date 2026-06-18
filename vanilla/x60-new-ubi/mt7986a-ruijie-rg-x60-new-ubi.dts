@@ -183,7 +183,7 @@
 		spi-cal-addrlen = <5>;
 		spi-cal-addr = /bits/ 32 <0x0 0x0 0x0 0x0 0x0>;
 
-		partitions {
+		partitions: partitions {
 			compatible = "fixed-partitions";
 			#address-cells = <1>;
 			#size-cells = <1>;
@@ -227,7 +227,7 @@
 			partition@680000 {
 				label = "ubi";
 				compatible = "linux,ubi";
-				reg = <0x680000 0x7980000>;
+				reg = <0x680000 0x0>;
 
 				volumes {
 					ubi-volume-factory {

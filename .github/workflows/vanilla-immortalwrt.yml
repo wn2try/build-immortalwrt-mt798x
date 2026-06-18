@@ -53,8 +53,7 @@ jobs:
 
         echo "run script..."
         cd vanilla
-        chmod +x mkimg.sh
-        ./mkimg.sh
+        bash mkimg.sh
 
     - name: Create release variables
       run: |
