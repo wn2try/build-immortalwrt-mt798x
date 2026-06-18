@@ -5,11 +5,7 @@ platform_do_upgrade() {
 	fit_do_upgrade "$1"
 }
 
-PART_NAME=firmware
-
 platform_check_image() {
-	local board=$(board_name)
-
 	[ "$#" -gt 1 ] && return 1
 
 	fit_check_image "$1"

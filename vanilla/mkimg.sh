@@ -41,8 +41,9 @@ fi
 
 if [ ! -d builder ]; then
   echo "download imagebuilder..."
-  wget -O - ${downloadurl} | tar --zstd -xf - 
-  mv *imagebuilder*-x86_64 builder
+  wget -q -O imagebuilder.tar.zst ${downloadurl}
+  tar --zstd -xf imagebuilder.tar.zst && rm imagebuilder.tar.zst
+  mv *imagebuilder* builder
 fi
 
 cd builder
@@ -147,9 +148,9 @@ rm -f ${initrddir}/init
 dumpimage -T flat_dt -p 0 -o ${outdir}/kernel.lzma \
 ${rootpath}/builder/staging_dir/target-aarch64_cortex-a53_musl/image/${initkernelsrc}
 
-dtc -@ -I dtb -O dts -o ${outdir}/initramfs.dts ${modeldir}/image-*-${model}.dtb
+dtc -I dtb -O dts -o ${outdir}/initramfs.dts ${modeldir}/image-*-${model}.dtb
 cat ${modeldir}/*${model}_initramfs.dtsi >> ${outdir}/initramfs.dts
-dtc -q -@ -I dts -O dtb -o ${outdir}/initramfs.dtb ${outdir}/initramfs.dts
+dtc -q -I dts -O dtb -o ${outdir}/initramfs.dtb ${outdir}/initramfs.dts
 
 echo -e "\ncreate its for initramfs..."
 kernelver=$(jq .linux_kernel.version ${outdir}/profiles.json | tr -d '"')
