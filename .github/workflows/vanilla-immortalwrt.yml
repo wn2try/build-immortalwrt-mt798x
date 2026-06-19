@@ -10,7 +10,7 @@ on:
         required: true
       openwrtver:
         description: Version Number (snapshot/25.12.0)
-        default: snapshot
+        default: 25.12.0
         required: true
       model:
         description: Device Model
@@ -26,7 +26,7 @@ on:
         required: false
       pkgremove:
         description: Packages to Remove
-        default: 
+        default: block-mount
         required: false
 
 jobs:
@@ -78,6 +78,6 @@ jobs:
         artifacts: vanilla/release/*
         token: ${{ secrets.GITHUB_TOKEN }}
         body: |
-          - ImmortalWrt: `${{env.IMOWRT_VER}} ~ ${{env.VER_CODE}}`
+          - ImmortalWrt (vanilla): `${{env.IMOWRT_VER}} ~ ${{env.VER_CODE}}`
           - Kernel: `${{env.KERNEL_VER}}`
           - Default IP: `192.168.1.1`

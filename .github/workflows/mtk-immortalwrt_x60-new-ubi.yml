@@ -112,7 +112,7 @@ jobs:
         artifacts: ./release/*
         token: ${{ secrets.GITHUB_TOKEN }}
         body: |
-          - ImmortalWrt: `${{env.IMOWRT_VER}} ~ ${{env.VER_CODE}}`
+          - ImmortalWrt (MTK): `${{env.IMOWRT_VER}} ~ ${{env.VER_CODE}}`
           - Kernel: `${{env.KERNEL_VER}}`
           - Default IP: `192.168.1.1`
 

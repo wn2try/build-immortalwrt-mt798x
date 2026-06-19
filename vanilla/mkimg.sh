@@ -5,7 +5,7 @@ set -eu
 
 variant=${variant:-immortalwrt}
 variant=${variant,,}
-openwrtver=${openwrtver:-snapshot}
+openwrtver=${openwrtver:-25.12.0}
 openwrtver=${openwrtver,,}
 
 model=${model:-x60-new-ubi}
