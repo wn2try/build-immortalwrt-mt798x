@@ -1,0 +1,17 @@
+#
+# Copyright (C) 2021 OpenWrt.org
+#
+
+[ -e /etc/config/ubootenv ] && exit 0
+
+touch /etc/config/ubootenv
+
+. /lib/uboot-envtools.sh
+. /lib/functions.sh
+
+ubootenv_add_ubi_default
+
+config_load ubootenv
+config_foreach ubootenv_add_app_config
+
+exit 0

@@ -1,21 +1,9 @@
 ## /etc/uci-defaults/99-custom 
 ## removed after execution with exit 0
 
-
-# u-boot env
-touch /etc/config/ubootenv
-. /lib/uboot-envtools.sh
-. /lib/functions.sh
-
-ubootenv_add_ubi_default
-config_load ubootenv
-config_foreach ubootenv_add_app_config
-
-
 # feeds
 sed -E -e '/routing|telephony|video/s/^/#/' \
     -e 's|mirrors.vsean.net/openwrt|downloads.immortalwrt.org|' \
     -i /etc/apk/repositories.d/distfeeds.list
-
 
 exit 0
