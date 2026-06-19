@@ -16,7 +16,7 @@
 	/delete-node/ band@1;
 };
 
-&{/soc/spi@1100a000/spi-nand@0/partitions} {
+&{/soc/spi@1100a000/flash@0/partitions} {
 	partition@0 { /* bl2 */
 		/delete-property/ read-only;
 	};
@@ -33,11 +33,15 @@
 		/delete-property/ read-only;
 	};
 
-	partition@580000 { /* product_info */
+	partition@580000 { /* fip2 */
 		/delete-property/ read-only;
 	};
 
-	partition@600000 { /* kdump */
+	partition@780000 { /* product_info */
+		/delete-property/ read-only;
+	};
+
+	partition@800000 { /* kdump */
 		/delete-property/ read-only;
 	};
 };
