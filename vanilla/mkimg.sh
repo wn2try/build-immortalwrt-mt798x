@@ -127,8 +127,11 @@ outdir=${rootpath}/builder/_output
 
 ## build sysupgrade.itb
 echo -e "\nbuild sysupgrade.itb..."
-[[ "$pkgremove" ]] && ! $(echo "$pkgremove" | grep -q '-') && \
+[[ "$pkgremove" ]] && ! $(echo "$pkgremove" | grep -qE '^-| -') && \
 pkgremove=$(echo "$pkgremove" | sed "s/ / -/g; s/^/-/")
+
+echo "pkgadd=${pkgadd}"
+echo "pkgremove=${pkgremove}"
 
 make image \
 PROFILE="${device}" \

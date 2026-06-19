@@ -1,17 +1,8 @@
 // SPDX-License-Identifier: (GPL-2.0 OR MIT)
 
 /dts-v1/;
-#include "mt7986a-ruijie-rg-x60-new-common.dtsi"
 
-/ {
-	model = "Ruijie RG-X60 New (UBI)";
-	compatible = "ruijie,rg-x60-new-ubi", "mediatek,mt7986a";
-};
-
-&chosen {
-	rootdisk = <&ubi_rootdisk>;
-	bootargs = "root=/dev/fit0 rootwait";
-};
+#include "mt7986a-ruijie-rg-x60-new-ubi.dts"
 
 &gmac0 {
 	/delete-property/ nvmem-cells;
@@ -23,56 +14,35 @@
 	/delete-property/ nvmem-cell-names;
 };
 
-&partition_ubi {
-	compatible = "linux,ubi";
-	reg = <0x680000 0x0>;
-	mtd-extend-to-end;
+&wifi {
+	/delete-property/ #address-cells;
+	/delete-property/ #size-cells;
+	/delete-node/ band@0;
+	/delete-node/ band@1;
+};
 
-	volumes {
-		ubi-volume-factory {
-			volname = "factory";
+&partitions {
+	partition@0 { /* bl2 */
+		/delete-property/ read-only;
+	};
 
-			nvmem-layout {
-				compatible = "fixed-layout";
-				#address-cells = <1>;
-				#size-cells = <1>;
-				
-				eeprom_factory_0: eeprom@0 {
-					reg = <0x0 0x1000>;
-				};
-			};
-		};
+	partition@100000 { /* u-boot-env */
+		/delete-property/ read-only;
+	};
 
-		ubi-volume-productinfo {
-			volname = "product_info";
+	partition@180000 { /* Factory */
+		/delete-property/ read-only;
+	};
 
-			nvmem-layout {
-				compatible = "fixed-layout";
-				#address-cells = <1>;
-				#size-cells = <1>;
+	partition@380000 { /* fip */
+		/delete-property/ read-only;
+	};
 
-				label_mac: ethaddr@34 {
-					compatible = "mac-base";
-					reg = <0x34 0x11>;
-					#nvmem-cell-cells = <1>;
-				};
-			};
-		};
+	partition@580000 { /* product_info */
+		/delete-property/ read-only;
+	};
 
-		ubi-volume-fip {
-			volname = "fip";
-		};
-
-		ubi-volume-ubootenv {
-			volname = "ubootenv";
-		};
-
-		ubi-volume-ubootenv2 {
-			volname = "ubootenv2";
-		};
-
-		ubi_rootdisk: ubi-volume-fit {
-			volname = "fit";
-		};
+	partition@600000 { /* kdump */
+		/delete-property/ read-only;
 	};
 };
