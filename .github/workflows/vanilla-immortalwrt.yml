@@ -1,4 +1,4 @@
-name:  Vanilla ImmortalWrt ~ X60 New / X30E Pro - UBI
+name:  Vanilla ImmortalWrt: X60 New/X30E Pro (UBI)
 
 on:
   # Allows you to run this workflow manually from the Actions tab
@@ -13,7 +13,7 @@ on:
         default: 25.12.0
         required: true
       model:
-        description: Device Model (x60-new-ubi / x30e-pro-ubi)
+        description: Device Model (x60-new-ubi/x30e-pro-ubi)
         default: x60-new-ubi
         required: true
       vendor:

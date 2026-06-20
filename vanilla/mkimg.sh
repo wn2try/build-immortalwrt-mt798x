@@ -51,14 +51,14 @@ cd builder
 ## add build target
 echo -e "\nadd build target into makefile..."
 modeldir=${rootpath}/${model}
-makefile=target/linux/${platform}/image/${subtarget}.mk
+makefile=${rootpath}/builder/target/linux/${platform}/image/${subtarget}.mk
 sed "/${device}/,/${device}/d" -i ${makefile}
 cat ${modeldir}/${model}.mk >> ${makefile}
 
 
 ## add board profile
 echo -e "\nadd board profile into .targetinfo"
-prof=.targetinfo
+prof=${rootpath}/builder/.targetinfo
 sed "/Target-Profile: DEVICE_${device}/,/@@/d" -i ${prof}
 
 export profile=$(sed ':a; /\\$/ { N; s/\\\n//; ba }' ${modeldir}/${model}.mk | awk '
@@ -108,7 +108,8 @@ cp -rf ${rootpath}/files .
 ## copy dtb to build dir
 echo -e "\ncopy dtb to build dir..."
 kerneldir=${rootpath}/builder/build_dir/target-aarch64_cortex-a53_musl/linux-${platform}_${subtarget}
-cp ${modeldir}/image-*-${model}.dtb ${kerneldir}/
+dtbver=(cd ${kerneldir}; ls -d linux-* | grep -oE '[6-9].[0-9]+')
+cp ${modeldir}/image-*-${model}_${dtbver}.dtb ${kerneldir}/image-*-${model}.dtb
 
 
 ## create kernel.bin
@@ -151,7 +152,7 @@ rm -f ${initrddir}/init
 dumpimage -T flat_dt -p 0 -o ${outdir}/kernel.lzma \
 ${rootpath}/builder/staging_dir/target-aarch64_cortex-a53_musl/image/${initkernelsrc}
 
-dtc -I dtb -O dts -o ${outdir}/initramfs.dts ${modeldir}/image-*-${model}.dtb
+dtc -I dtb -O dts -o ${outdir}/initramfs.dts ${modeldir}/image-*-${model}_${dtbver}.dtb
 cat ${modeldir}/*${model}_initramfs.dtsi >> ${outdir}/initramfs.dts
 dtc -q -I dts -O dtb -o ${outdir}/initramfs.dtb ${outdir}/initramfs.dts
 
