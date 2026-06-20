@@ -4,7 +4,8 @@ define Device/ruijie_rg-x30e-pro-ubi
   DEVICE_MODEL := RG-X30E Pro (UBI)
   DEVICE_DTS := mt7981b-ruijie-rg-x30e-pro-ubi
   DEVICE_DTS_DIR := ../dts
-  DEVICE_PACKAGES :=kmod-mtd-rw
+  DEVICE_PACKAGES :=kmod-mt7915e kmod-mt7981-firmware \
+  mt7981-wo-firmware kmod-mtd-rw
   BLOCKSIZE := 128k
   PAGESIZE := 2048
   KERNEL_IN_UBI := 1
