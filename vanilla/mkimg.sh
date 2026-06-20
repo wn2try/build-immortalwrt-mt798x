@@ -109,7 +109,8 @@ cp -rf ${rootpath}/files .
 echo -e "\ncopy dtb to build dir..."
 kerneldir=${rootpath}/builder/build_dir/target-aarch64_cortex-a53_musl/linux-${platform}_${subtarget}
 dtbver=$(cd ${kerneldir}; ls -d linux-* | grep -oE '[6-9].[0-9]+')
-cp ${modeldir}/image-*-${model}_${dtbver}.dtb ${kerneldir}/image-*-${model}.dtb
+dtbnm=$(cd ${modeldir}; ls *${model}.dts | sed 's/dts/dtb/')
+cp ${modeldir}/*-${model}_${dtbver}.dtb ${kerneldir}/image-${dtbnm}
 
 
 ## create kernel.bin
