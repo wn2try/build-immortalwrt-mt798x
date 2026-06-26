@@ -50,7 +50,8 @@ cd builder
 
 ## add build target
 echo -e "\nadd build target into makefile..."
-modeldir=${rootpath}/${model}
+basemodel=$(echo ${model} | sed -E 's/-ubi|-ubootmod//')
+modeldir=${rootpath}/${basemodel}
 makefile=${rootpath}/builder/target/linux/${platform}/image/${subtarget}.mk
 sed "/${device}/,/${device}/d" -i ${makefile}
 cat ${modeldir}/${model}.mk >> ${makefile}
@@ -66,30 +67,31 @@ BEGIN {
     has_meta = 0
     pkg = ""
 }
+/define Device/ {
+    model = $0;
+    sub(/define Device.*_/, "", model);
+    gsub(/[[:space:]]+/, "", model);
+}
 /:=/ {
     k = $1; v = $0;
     sub(/^.*:=/, "", v);
     gsub(/^[[:space:]]+|[[:space:]]+$/, "", k);
     gsub(/[[:space:]]+/, " ", v);
     gsub(/^[[:space:]]+|[[:space:]]+$/, "", v);
-
     if (k == "DEVICE_VENDOR") vendor = v;
-    if (k == "DEVICE_MODEL") model = v;
+    if (k == "DEVICE_MODEL") devmodel = v;
     if (k == "DEVICE_PACKAGES") pkg = v;
 }
 /append-metadata/ { has_meta = 1 }
 END {
     vendorl = tolower(vendor)
-    modell = tolower(model)
-    gsub(/[()]/, "", modell)
-    gsub(" ", "-", modell)
-    printf "\nTarget-Profile: DEVICE_%s_%s\n", vendorl, modell
-    printf "Target-Profile-Name: %s %s\n", vendor, model
+    printf "\nTarget-Profile: DEVICE_%s_%s\n", vendorl, model
+    printf "Target-Profile-Name: %s %s\n", vendor, devmodel
     printf "Target-Profile-Packages: %s \n", pkg
     printf "Target-Profile-hasImageMetadata: %d\n", has_meta
-    printf "Target-Profile-SupportedDevices: %s,%s\n\n\n", vendorl, modell
+    printf "Target-Profile-SupportedDevices: %s,%s\n\n\n", vendorl, model
     printf "Target-Profile-Description:\n"
-    printf "Build firmware images for %s %s\n\n\n\n\n\n@@\n", vendor, model
+    printf "Build firmware images for %s %s\n\n\n\n\n\n@@\n", vendor, devmodel
 }')
 
 awk -v p="Target: ${platform}/${subtarget}" \
