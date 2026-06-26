@@ -145,19 +145,25 @@ PACKAGES="${pkgadd} ${pkgremove}"
 
 
 ## create initramfs.itb
-echo -e "\nprepare initrd..."
+echo -e "\nprepare initrd for initramfs..."
 initrddir=${rootpath}/builder/build_dir/target-aarch64_cortex-a53_musl/root-${platform}
 cp -fpR ${rootpath}/builder/target/linux/generic/other-files/init ${initrddir}/
 (cd ${initrddir}; find . | LC_ALL=C sort | ${hostbindir}/cpio --reproducible -o -H newc -R 0:0 > ${outdir}/initrd.cpio)
 ${hostbindir}/xz -T0 -9 -fz --check=crc32 ${outdir}/initrd.cpio
 rm -f ${initrddir}/init
 
+echo -e "\nprepare kernel for initramfs..."
 dumpimage -T flat_dt -p 0 -o ${outdir}/kernel.lzma \
 ${rootpath}/builder/staging_dir/target-aarch64_cortex-a53_musl/image/${initkernelsrc}
 
-dtc -I dtb -O dts -o ${outdir}/initramfs.dts ${modeldir}/image-*-${model}_${dtbver}.dtb
-cat ${modeldir}/*${model}_initramfs.dtsi >> ${outdir}/initramfs.dts
-dtc -q -I dts -O dtb -o ${outdir}/initramfs.dtb ${outdir}/initramfs.dts
+echo -e "\nprepare dtb for initramfs..."
+if [ -e ${modeldir}/*${model}_initramfs.dtsi ]; then
+  dtc -q -I dtb -O dts -o ${outdir}/initramfs.dts ${modeldir}/image-*-${model}_${dtbver}.dtb
+  cat ${modeldir}/*${model}_initramfs.dtsi >> ${outdir}/initramfs.dts
+  dtc -q -I dts -O dtb -o ${outdir}/initramfs.dtb ${outdir}/initramfs.dts
+else
+  cp ${modeldir}/image-*-${model}_${dtbver}.dtb ${outdir}/initramfs.dtb
+fi
 
 echo -e "\ncreate its for initramfs..."
 kernelver=$(jq .linux_kernel.version ${outdir}/profiles.json | tr -d '"')
