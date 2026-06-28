@@ -1,4 +1,9 @@
 
+&{/chosen} {
+	/delete-property/ rootdisk;
+	/delete-property/ bootargs;
+};
+
 &{/soc/ethernet@15100000/mac@0} {
 	/delete-property/ nvmem-cells;
 	/delete-property/ nvmem-cell-names;

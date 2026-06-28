@@ -19,7 +19,7 @@
 		led-upgrade = &sysled_red;
 	};
 
-	chosen {
+	chosen: chosen {
 		stdout-path = "serial0:115200n8";
 		rootdisk = <&ubi_rootdisk>;
 		bootargs = "root=/dev/fit0 rootwait";
